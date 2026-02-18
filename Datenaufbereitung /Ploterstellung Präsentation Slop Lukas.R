@@ -115,8 +115,6 @@ fig <- plot_ly() %>%
 
 fig
 
-library(lubridate) # Für das Datum
-
 # Daten vorbereiten
 cor.data <- dat %>%
   mutate(
