@@ -1,4 +1,9 @@
 
+library(tidyverse)
+library(janitor)
+
+#Daten in CSV Datei umwandeln 
+
 # 1. Erstelle ein leeres Environment und lade die Datei dorthin
 my_data <- new.env()
 load("vancomycin.RData", envir = my_data)
@@ -9,5 +14,4 @@ ls(envir = my_data)
 # -> Sagen wir mal, der Befehl oben zeigt dir, dass das Objekt "vancomycin_df" heißt.
 
 # 3. Speichere genau dieses Objekt als CSV ab
-write.csv(my_data$vancomycin_df, "vancomycin_export.csv", row.names = FALSE)
-
+write.csv(my_data$vancomycin_df, "vancomycin_export.c
