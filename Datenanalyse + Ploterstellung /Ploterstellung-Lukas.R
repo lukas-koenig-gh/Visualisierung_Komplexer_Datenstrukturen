@@ -4,6 +4,7 @@
 data <- read.csv("dat.csv")
 
 library(tidyverse)
+library(grid)
 
 #Plot 1 - Scatterplot mit Spezieller Regressionsanalyse 
 
@@ -49,30 +50,18 @@ plot.2.avg.data <- plot.2.data %>%
 
 plot.2.final.data <- plot.2.data %>%
   filter(ID %in% c(7, 11)) %>%
+  mutate(ID = as.character(ID)) %>%
   bind_rows(plot.2.avg.data)
-  
-ggplot(plot.2.final.data, aes(x = eGFR, y = C, color = ID)) +
-  # 1. Die "Todeszone" markieren (Leitlinie: Toxisch über 20 mg/L)
-  geom_hline(yintercept = 20, linetype = "dashed", color = "red", alpha = 0.6, linewidth = 1) +
-  annotate("text", x = 140, y = 21, label = "Toxizitäts-Grenze (>20)", color = "red", vjust = -0.5) +
-  
-  # 2. Die Trajektorie (der Pfad) MIT Pfeilen, um die Zeitrichtung (24h -> 48h -> 72h) zu zeigen
-  geom_path(arrow = arrow(length = unit(0.3, "cm"), type = "closed"), linewidth = 1.2, alpha = 0.8) +
-  
-  # 3. Die eigentlichen Messpunkte (als dicke Punkte auf der Linie)
+
+ggplot(plot.2.final.data, aes(x = C, y = eGFR, color = ID)) +
+  geom_path(arrow = arrow(length = unit(0.3, "cm"), type = "closed")) +
   geom_point(size = 3) +
+  geom_hline(yintercept = 20) +
+  scale_color_viridis_d(option = "mako", begin = 0.3, end = 0.8) +
+  theme_minimal()
   
-  # 4. Optik: Farben und Beschriftungen
-  scale_color_viridis_d(option = "turbo", name = "Patienten-Verlauf") +
-  labs(
-    title = "Das hämodynamische Paradoxon (Phasenraum)",
-    subtitle = "Dynamik der Nierenfunktion vs. Medikamentenspiegel über 72 Stunden",
-    x = "Nierenfunktion (eGFR in mL/min)",
-    y = "Vancomycin-Spiegel (C in mg/L)"
-  ) +
-  theme_minimal(base_size = 14) +
-  theme(
-    legend.position = "top",
-    plot.title = element_text(face = "bold")
-  )
+ggplot(plot.2.data, aes(x = eGFR, y = C, group = ID)) +
+  geom_path(alpha = 0.1, color = "grey") +
+  geom_path(data = plot.2.final.data, aes(color = ID))
+
   
