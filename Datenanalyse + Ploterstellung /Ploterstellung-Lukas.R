@@ -41,14 +41,14 @@ ggplot(plot.1.data, aes(x = Weight, y = LD, color = dose.class, fill = dose.clas
   ) 
 
 ggsave(
-  filename = "Regressionplot.pdf", # Den Namen kannst du natürlich anpassen
+  filename = "Regressionplot.png",
   width = 30,
   height = 13,
   units = "cm",
-  device = "pdf"
+  device = "png"
 )
 
-#Erstellung von Plot 2 
+#Erstellung von Plot 2 ^
 
 plot.2.data <- data %>%
   select("C24", "C48", "C72") %>%
@@ -76,10 +76,10 @@ ggplot(plot.2.data, aes(y = Werte, x = Time, fill = Time)) +
   )
 
 ggsave(
-  filename = "Boxplot.pdf", # Den Namen kannst du natürlich anpassen
+  filename = "Boxplot.png",
   width = 30,
   height = 13,
   units = "cm",
-  device = "pdf"
+  device = "png"
 )
 
