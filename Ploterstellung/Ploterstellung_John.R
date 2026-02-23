@@ -40,19 +40,42 @@ co_occur_df <- as.data.frame(as.table(co_occur)) %>%
   mutate(Indikation = factor(Indikation, levels = rownames(co_occur)[hc_ind$order]),
          Befund = factor(Befund, levels = colnames(co_occur)[hc_bef$order]))
 
-plot_heatmap <- ggplot(co_occur_df, aes(x = Indikation, y = Befund, fill = Haeufigkeit)) +
-  geom_tile(color = "white", linewidth = 0.5) +
-  geom_text(aes(label = Haeufigkeit, color = Haeufigkeit > max(Haeufigkeit)/2), 
-            size = 3.5, show.legend = FALSE) +
-  scale_color_manual(values = c("FALSE" = "black", "TRUE" = "white")) +
+#plot_heatmap <- 
+  ggplot(co_occur_df, aes(x = Indikation,
+                                        y = Befund,
+                                        fill = Haeufigkeit)) +
+  geom_tile(color = "white",
+            linewidth = 0.5) +
+  geom_text(aes(label = Haeufigkeit,
+                color = Haeufigkeit > max(Haeufigkeit)/2), 
+            size = 3.5,
+            show.legend = FALSE) +
+  scale_color_manual(values = c("FALSE" = "black",
+                                "TRUE" = "white")) +
+  scale_fill_viridis_c(option = "mako",
+                       begin = 0.3,
+                       end = 0.8 ) +
+  
   # Ein schöner Blau-Verlauf passend zum Beeswarm-Blau
-  scale_fill_gradient(low = "#F0F7FF", high = main_blue, name = "Fälle") +
-  theme_minimal(base_size = 14) +
+  #scale_fill_gradient(low = "#F0F7FF", high = main_blue, name = "Fälle") +
+  theme_minimal(base_size = 12) +
+  
+  #Achsenbeschriftung und Theme Anpassungen 
   labs(title = "Zusammenhang: Indikationen & Befunde",
-       x = "Indikation", y = "Befund") +
+       x = "Indikation",
+       y = "Befund") +
+  
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         panel.grid = element_blank())
 
+  ggsave(
+    filename = "Tileplot_John.png",
+    width = 30,
+    height = 13,
+    units = "cm",
+    device = "png"
+  )
+  
 #################################################
 # 3. BEESWARM PLOT (DEUTSCH & OPTIMIERT)
 #################################################
@@ -67,25 +90,21 @@ df_violin <- vancomycin %>%
   mutate(Indikation = reorder(Indikation, Age, FUN = median))
 
 # Der Plot
-plot_beeswarm <- ggplot(df_violin, aes(x = Indikation, y = Age, color = Gender)) +
-  geom_quasirandom(dodge.width = 0.8, alpha = 0.6, size = 1.5) +
+#plot_beeswarm <- 
+ggplot(df_violin, aes(x = Indikation, y = Age, color = Gender)) +
+  geom_quasirandom(dodge.width = 0.8, alpha = 0.6, size2 = 1.5) +
   geom_boxplot(aes(fill = Gender), 
                position = position_dodge(width = 0.8), 
                width = 0.25, 
                outlier.shape = NA, 
-               alpha = 0.4, 
+               alpha = 0.5, 
                color = "gray20") +
   # Hier werden die Farben zugewiesen und die Legende beschriftet
-  scale_color_manual(
-    values = my_colors,
-    name = NULL, # Entfernt das Wort "Gender" über der Legende
-    labels = c("female" = "Weiblich", "male" = "Männlich")
-  ) +
-  scale_fill_manual(
-    values = my_colors,
-    name = NULL, # Entfernt das Wort "Gender" für die Füllung
-    labels = c("female" = "Weiblich", "male" = "Männlich")
-  ) +
+  scale_color_viridis_d(option = "mako", begin = 0.4, end = 0.8) +
+  scale_fill_viridis_d(option = "mako", begin = 0.4, end = 0.8) +
+  
+  #scale_color_manual(values = my_colors, name = NULL, # Entfernt das Wort "Gender" über der Legende labels = c("female" = "Weiblich", "male" = "Männlich")) +
+  #scale_fill_manual(values = my_colors, name = NULL, labels = c("female" = "Weiblich", "male" = "Männlich")) +
   theme_minimal(base_size = 14) +
   labs(title = "Altersverteilung nach Indikation",
        subtitle = "Vergleich zwischen weiblichen (orange) und männlichen (blau) Patienten",
@@ -96,8 +115,17 @@ plot_beeswarm <- ggplot(df_violin, aes(x = Indikation, y = Age, color = Gender))
         legend.text = element_text(size = 12), # Schriftgröße der Legende
         panel.grid.minor = element_blank())
 
+#Abspeichern der Grafik 
+ggsave(
+  filename = "Beeswarmplot_John.png",
+  width = 30,
+  height = 13,
+  units = "cm",
+  device = "png"
+)
 #################################################
 # 4. ANZEIGE
 #################################################
-print(plot_heatmap)
-print(plot_beeswarm)
+#print(plot_heatmap)
+#print(plot_beeswarm)
+

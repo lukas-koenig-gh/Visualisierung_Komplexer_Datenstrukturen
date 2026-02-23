@@ -1,7 +1,9 @@
 #Erstellung der Plots - Lukas 
 
+load("vancomycin.RData")
+
 #Setup/Vorbereitung 
-data <- read.csv("dat.csv")
+data <- dat
 
 library(tidyverse)
 library(grid)
@@ -65,7 +67,7 @@ ggplot(plot.1.data, aes(x = Weight, y = LD, color = dose.class, fill = dose.clas
 
 #Wir Speichern den Plot als PNG für einfache Übergabe in powerpoint 
 ggsave(
-  filename = "Regressionplot.png",
+  filename = "Regressionplot_Scatterplot_Lukas.png",
   width = 30,
   height = 13,
   units = "cm",
@@ -124,7 +126,7 @@ ggplot(plot.2.data, aes(y = Werte, x = Time, fill = Time)) +
 
 #Wir speichern den Plot ab 
 ggsave(
-  filename = "Boxplot.png",
+  filename = "Boxplot_Lukas.png",
   width = 30,
   height = 13,
   units = "cm",
