@@ -1,19 +1,12 @@
+#Code von Elaha 
+
+#Setup 
+
+#Pakete Laden 
 library(tidyverse)
 
-### 1. Komorbiditäten (Begleiterkrankungen) ###
-
-to01 <- function(x) {
-  if (is.numeric(x)) return(ifelse(is.na(x), NA_real_, ifelse(x > 0, 1, 0)))
-  if (is.logical(x)) return(ifelse(is.na(x), NA_real_, as.numeric(x)))
-  
-  x_chr <- tolower(trimws(as.character(x)))
-  
-  yes_vals <- c("1", "yes", "y", "true", "ja", "j", "t", "pos", "positiv", "present")
-  no_vals  <- c("0", "no", "n", "false", "nein", "f", "neg", "negativ", "absent")
-  
-  ifelse(x_chr %in% yes_vals, 1,
-         ifelse(x_chr %in% no_vals, 0, NA_real_))
-}
+#Datensatz laden
+load("vancomycin.RData")
 
 # Labels (Präsentation: verständlich statt Abkürzungen)
 comorb_labels <- c(
@@ -27,86 +20,142 @@ comorb_labels <- c(
 )
 
 comorbidity_long <- dat %>%
-  select(Cardiovascular, Hypertension, CHF, CKD, COPD, DM, Malignancy) %>%
-  mutate(across(everything(), to01)) %>%
-  pivot_longer(everything(), names_to = "Komorbidität", values_to = "Vorhanden") %>%
-  group_by(Komorbidität) %>%
+  
+  #Ausswahl aller Werte dessen Namen wir oben angepasst haben 
+  select(all_of(names(comorb_labels))) %>%
+  
+  #Datensatz langziehen für ggplot
+  pivot_longer(everything(), names_to = "Komorbiditaet", values_to = "Vorhanden") %>%
+  
+  #Fehlende Werte Entfernen 
+  drop_na(Vorhanden) %>%
+  
+  #Gruppieren nach Komorbidität
+  group_by(Komorbiditaet) %>%
+  
+  #Summen und Durchschnitte Berechnen 
   summarise(
-    n_total = n(),
-    n_valid = sum(!is.na(Vorhanden)),
-    Anteil  = mean(Vorhanden == 1, na.rm = TRUE) * 100,
+    #   n_total = n(),
+    #   n_valid = sum(!is.na(Vorhanden)),
+    Anteil  = mean(Vorhanden == "yes", na.rm = TRUE) * 100,
     .groups = "drop"
   ) %>%
+  
+  #Anpassung der Labels für besseres Verständnis im Plot 
   mutate(
-    Komorbidität = recode(Komorbidität, !!!comorb_labels)
+    Komorbidität = recode(Komorbiditaet, !!!comorb_labels)
   )
 
-# Optional: Missingness-Info als Untertitel (nur wenn wirklich Missing da ist)
-missing_info <- comorbidity_long %>%
-  summarise(miss = sum(n_total - n_valid)) %>%
-  pull(miss)
-
-subt <- if (missing_info > 0) {
-  paste0("Hinweis: ", missing_info, " fehlende Werte über alle Komorbiditäten")
-} else {
-  NULL
-}
-
-ggplot(comorbidity_long, aes(x = reorder(Komorbidität, Anteil), y = Anteil)) +
-  geom_col(fill = "#2C7BB6") +
-  geom_text(aes(label = sprintf("%.1f", Anteil)),
-            hjust = -0.15, size = 4) +
+ggplot(comorbidity_long, aes(x = reorder(Komorbiditaet, Anteil), y = Anteil, fill = Komorbiditaet)) +
+  geom_col() +
+  geom_text(aes(label = sprintf("%.1f", Anteil)), hjust = -0.15, size = 4) +
   coord_flip() +
+  scale_fill_viridis_d(option = "mako", begin = 0.3, end = 0.8) +
   labs(
     title = "Prävalenz der Komorbiditäten",
-    subtitle = subt,
     x = "Komorbidität",
     y = "Anteil der Patienten (%)"
   ) +
+  #Theme Auswahl
   theme_minimal(base_size = 14) +
-  scale_y_continuous(limits = c(0, max(comorbidity_long$Anteil) + 6),
-                     expand = expansion(mult = c(0, 0.02)))
+  
+  #Entfernen der Legende
+  theme(
+    legend.position = "none"
+  ) +
 
+scale_y_continuous(limits = c(0, max(comorbidity_long$Anteil) + 6),
+                   expand = expansion(mult = c(0, 0.02)))
+
+#Speichern des Plots
+ggsave(
+  filename = "Barplot_Elaha.png",
+  width = 30,
+  height = 13,
+  units = "cm",
+  device = "png"
+)
 
 ### 2. Schweregrad der Erkrankung ###
 
 severity_long <- dat %>%
+  
+  #Auswahl der Daten
   select(SAPS, SOFA, Leukocytes, CRP) %>%
+  
+  #Langziehen der Daten für ggplot
   pivot_longer(everything(), names_to = "Parameter", values_to = "Wert") %>%
+  
+  #Entfernen der NA Werte
+  drop_na(Wert) %>%
+  
+  #Modifizeren der Reinfolge und Labels 
   mutate(
     # Reihenfolge (erst Scores, dann Labore)
-    Parameter = factor(Parameter, levels = c("SAPS", "SOFA", "Leukocytes", "CRP")),
-    # Schönere Namen + Einheiten
-    Parameter_label = recode(Parameter,
-                             "SAPS" = "SAPS (Score)",
-                             "SOFA" = "SOFA (Score)",
-                             "Leukocytes" = "Leukozyten (/nL)",
-                             "CRP" = "CRP (mg/dL)"
-    )
+    Parameter_label = factor(Parameter,
+                       levels = c("SAPS",
+                                  "SOFA",
+                                  "Leukocytes",
+                                  "CRP"),
+                       labels = c("SAPS" = "SAPS (Score)",
+                                  "SOFA" = "SOFA (Score)",
+                                  "Leukocytes" = "Leukozyten (/nL)",
+                                  "CRP" = "CRP (mg/dL)"))
+    
   )
 
 # Mediane pro Panel berechnen (für Label)
 meds <- severity_long %>%
+  
+  #Gruppierung nach Parametern
   group_by(Parameter_label) %>%
+  
+  #Berechnung des Medians für den Text 
   summarise(median = median(Wert, na.rm = TRUE), .groups = "drop")
 
-ggplot(severity_long, aes(x = "", y = Wert)) +
-  geom_boxplot(fill = "#FDAE61", alpha = 0.85, width = 0.6, outlier.alpha = 0.6) +
+
+#Erstellung des Plots
+ggplot(severity_long, aes(x = "", y = Wert, fill = Parameter)) +
+  
+  #Boxplot 
+  geom_boxplot(alpha = 0.85, width = 0.6, outlier.alpha = 0.6) +
+  
+  #Erstellen mehrerer Grafiken
   facet_wrap(~ Parameter_label, scales = "free_y") +
+  
+  #Überlegen des Median Textes
   geom_text(
     data = meds,
     aes(x = 1, y = median, label = paste0("Median: ", round(median, 1))),
     inherit.aes = FALSE,
     vjust = -0.8, size = 4
   ) +
+  
+  #Farbauswahl 
+  scale_fill_viridis_d(option = "mako", begin = 0.3, end = 0.8) +
+  
+  #Beschriftungen 
   labs(
     title = "Schweregradparameter zu Therapiebeginn",
     x = NULL,
     y = "Wert"
   ) +
+  
+  #Theme Auswahl und Einstellungen 
   theme_minimal(base_size = 14) +
+  
   theme(
     strip.text = element_text(face = "bold"),
     axis.text.x = element_blank(),
-    axis.ticks.x = element_blank()
+    axis.ticks.x = element_blank(),
+    legend.position = "none"
   )
+
+#Speichern des Plots
+ggsave(
+  filename = "Boxplot_John.png",
+  width = 30,
+  height = 13,
+  units = "cm",
+  device = "png"
+)
