@@ -54,10 +54,11 @@ co_occur_df <- as.data.frame(as.table(co_occur)) %>%
                                 "TRUE" = "white")) +
   scale_fill_viridis_c(option = "mako",
                        begin = 0.3,
-                       end = 0.8 ) +
+                       end = 0.8,
+                       direction = -1) +
   
   # Ein schöner Blau-Verlauf passend zum Beeswarm-Blau
-  #scale_fill_gradient(low = "#F0F7FF", high = main_blue, name = "Fälle") +
+
   theme_minimal(base_size = 12) +
   
   #Achsenbeschriftung und Theme Anpassungen 
@@ -90,9 +91,8 @@ df_violin <- vancomycin %>%
   mutate(Indikation = reorder(Indikation, Age, FUN = median))
 
 # Der Plot
-#plot_beeswarm <- 
 ggplot(df_violin, aes(x = Indikation, y = Age, color = Gender)) +
-  geom_quasirandom(dodge.width = 0.8, alpha = 0.6, size2 = 1.5) +
+  geom_quasirandom(dodge.width = 0.8, alpha = 0.6, size = 1.5) +
   geom_boxplot(aes(fill = Gender), 
                position = position_dodge(width = 0.8), 
                width = 0.25, 
@@ -103,8 +103,6 @@ ggplot(df_violin, aes(x = Indikation, y = Age, color = Gender)) +
   scale_color_viridis_d(option = "mako", begin = 0.4, end = 0.8) +
   scale_fill_viridis_d(option = "mako", begin = 0.4, end = 0.8) +
   
-  #scale_color_manual(values = my_colors, name = NULL, # Entfernt das Wort "Gender" über der Legende labels = c("female" = "Weiblich", "male" = "Männlich")) +
-  #scale_fill_manual(values = my_colors, name = NULL, labels = c("female" = "Weiblich", "male" = "Männlich")) +
   theme_minimal(base_size = 14) +
   labs(title = "Altersverteilung nach Indikation",
        subtitle = "Vergleich zwischen weiblichen (orange) und männlichen (blau) Patienten",
@@ -123,9 +121,3 @@ ggsave(
   units = "cm",
   device = "png"
 )
-#################################################
-# 4. ANZEIGE
-#################################################
-#print(plot_heatmap)
-#print(plot_beeswarm)
-
