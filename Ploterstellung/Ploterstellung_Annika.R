@@ -18,7 +18,7 @@ nephrotoxins <- c("ACEI", "ARB", "Aminoglycosides", "Loop", "NSAID", "PipTaz", "
 ## Datenaufbereitung
 # Berechnung der Veränderung des Serumkreatinins von Start bis Ende
 vancomycin$Delta_SCr <- vancomycin$SCrEnd - vancomycin$SCrStart
-# Unbrauchbare Zeilen entfernen entfernen
+# Unbrauchbare Zeilen entfernen
 vancomycin <- vancomycin[!is.na(vancomycin$Delta_SCr), ]
 
 # Die Gruppe ohne Nephrotoxine extrahieren
@@ -31,7 +31,7 @@ no_nephrotoxins <- data.frame(
 list_nephrotoxins <- lapply(nephrotoxins, function(nephro) {
   # Wähle nur die Zeilen, wo das jeweilige Nephrotoxin "yes" ist
   nephrotoxin_used <- vancomycin[vancomycin[[nephro]] == "yes", ]
-  # Erstelle einen kleinen Dataframe für dieses Medikament
+  # Erstelle einen kleinen Dataframe für dieses Nephrotoxin
   data.frame(Gruppe = nephro, Delta_SCr = nephrotoxin_used$Delta_SCr)
 })
 
