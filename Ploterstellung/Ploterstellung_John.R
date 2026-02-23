@@ -1,6 +1,5 @@
-#################################################
-# 1. SETUP & DATEN (Einheitliche Farben definieren)
-#################################################
+
+#Setup
 library(tidyverse)
 library(viridis)
 library(lubridate)
@@ -20,9 +19,7 @@ mik_cols <- c("Culture", "Polymicrobial", "MSSA", "MRSA", "CoNS",
               "Streptococcus", "Enterococcus", "Enterobacterales", "PA", "Fungi")
 
 
-#################################################
-# 2. GECLUSTERTE HEATMAP (Blau-Schema)
-#################################################
+#Plot 1 - Heatmap 
 
 df_mik_ind <- vancomycin %>%
   
@@ -89,9 +86,7 @@ ggsave(
 )
 
 
-#################################################
-# 3. BEESWARM PLOT (DEUTSCH & OPTIMIERT)
-#################################################
+#Plot 2 - Beeswarm Plot
 
 # Vorbereitung der Daten
 df_violin <- vancomycin %>%

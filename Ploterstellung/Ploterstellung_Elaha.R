@@ -24,6 +24,7 @@ comorbidity_long <- dat %>%
   #Ausswahl aller Werte dessen Namen wir oben angepasst haben 
   select(all_of(names(comorb_labels))) %>%
   
+  
   #Datensatz langziehen für ggplot
   pivot_longer(everything(), names_to = "Komorbiditaet", values_to = "Vorhanden") %>%
   
@@ -33,10 +34,8 @@ comorbidity_long <- dat %>%
   #Gruppieren nach Komorbidität
   group_by(Komorbiditaet) %>%
   
-  #Summen und Durchschnitte Berechnen 
+  #Summen und Durchschnitt Berechnen 
   summarise(
-    #   n_total = n(),
-    #   n_valid = sum(!is.na(Vorhanden)),
     Anteil  = mean(Vorhanden == "yes", na.rm = TRUE) * 100,
     .groups = "drop"
   ) %>%
@@ -46,26 +45,40 @@ comorbidity_long <- dat %>%
     Komorbidität = recode(Komorbiditaet, !!!comorb_labels)
   )
 
-ggplot(comorbidity_long, aes(x = reorder(Komorbiditaet, Anteil), y = Anteil, fill = Komorbiditaet)) +
+#Erstellung des Plots
+ggplot(comorbidity_long, aes(x = reorder(Komorbiditaet, Anteil),
+                             y = Anteil, fill = Komorbiditaet)) +
+  
+  #Barplot
   geom_col() +
+  
+  #Text für den Median zum Drüberlegen 
   geom_text(aes(label = sprintf("%.1f", Anteil)), hjust = -0.15, size = 4) +
+  
+  #Anpassung der Aachse
+  scale_y_continuous(limits = c(0, max(comorbidity_long$Anteil) + 6),
+                     expand = expansion(mult = c(0, 0.02))) +
+  
+  #Drehen des Plots
   coord_flip() +
+  
+  #Farbauswahl
   scale_fill_viridis_d(option = "mako", begin = 0.3, end = 0.8) +
+  
+  #Achsenbeschriftung und Titelwahl
   labs(
     title = "Prävalenz der Komorbiditäten",
     x = "Komorbidität",
     y = "Anteil der Patienten (%)"
   ) +
+  
   #Theme Auswahl
   theme_minimal(base_size = 14) +
   
   #Entfernen der Legende
   theme(
     legend.position = "none"
-  ) +
-
-scale_y_continuous(limits = c(0, max(comorbidity_long$Anteil) + 6),
-                   expand = expansion(mult = c(0, 0.02)))
+  ) 
 
 #Speichern des Plots
 ggsave(
@@ -76,7 +89,7 @@ ggsave(
   device = "png"
 )
 
-### 2. Schweregrad der Erkrankung ###
+#2. Schweregrad der Erkrankung 
 
 severity_long <- dat %>%
   
@@ -93,14 +106,14 @@ severity_long <- dat %>%
   mutate(
     # Reihenfolge (erst Scores, dann Labore)
     Parameter_label = factor(Parameter,
-                       levels = c("SAPS",
-                                  "SOFA",
-                                  "Leukocytes",
-                                  "CRP"),
-                       labels = c("SAPS" = "SAPS (Score)",
-                                  "SOFA" = "SOFA (Score)",
-                                  "Leukocytes" = "Leukozyten (/nL)",
-                                  "CRP" = "CRP (mg/dL)"))
+                             levels = c("SAPS",
+                                        "SOFA",
+                                        "Leukocytes",
+                                        "CRP"),
+                             labels = c("SAPS" = "SAPS (Score)",
+                                        "SOFA" = "SOFA (Score)",
+                                        "Leukocytes" = "Leukozyten (/nL)",
+                                        "CRP" = "CRP (mg/dL)"))
     
   )
 
@@ -153,7 +166,7 @@ ggplot(severity_long, aes(x = "", y = Wert, fill = Parameter)) +
 
 #Speichern des Plots
 ggsave(
-  filename = "Boxplot_John.png",
+  filename = "Boxplot_Elaha.png",
   width = 30,
   height = 13,
   units = "cm",
