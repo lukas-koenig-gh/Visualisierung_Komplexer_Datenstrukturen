@@ -7,6 +7,7 @@ data <- dat
 
 library(tidyverse)
 library(grid)
+library(svglite)
 
 #Plot 1 - Scatterplot mit Polynomieller Regressionsanalyse 
 
@@ -57,7 +58,7 @@ ggplot(plot.1.data, aes(x = Weight, y = LD, color = dose.class, fill = dose.clas
     title ="Verteilung der Dosis abhängig vom Gewicht",
     subtitle = "Gruppiert nach Konzentration von Vancomycin in mg/L nach 24 Stunden",
     x = "Gewicht (in kg)",
-    y = "Initialdosis"
+    y = "Initialdosis (in mg/Kg)"
     
     #Wir entfernen die Legende 
   ) +
@@ -67,11 +68,11 @@ ggplot(plot.1.data, aes(x = Weight, y = LD, color = dose.class, fill = dose.clas
 
 #Wir Speichern den Plot als PNG für einfache Übergabe in powerpoint 
 ggsave(
-  filename = "Regressionplot_Scatterplot_Lukas.png",
+  filename = "Regressionplot_Scatterplot_Lukas.svg",
   width = 30,
   height = 13,
   units = "cm",
-  device = "png"
+  device = "svg"
 )
 
 #Erstellung von Plot 2, Boxplot des Verlaufs vom Antibiotikumsspiegel
@@ -126,10 +127,69 @@ ggplot(plot.2.data, aes(y = Werte, x = Time, fill = Time)) +
 
 #Wir speichern den Plot ab 
 ggsave(
-  filename = "Boxplot_Lukas.png",
+  filename = "Boxplot_Lukas.svg",
   width = 30,
   height = 13,
   units = "cm",
-  device = "png"
+  device = "svg"
 )
 
+
+#Plot 3 - Zusammenhang zwischen Nierenfunktion und der Abbaurate von Vancomyicin 
+
+#Datenaufbereitung 
+plot.3.data <- data %>%
+  
+  #Wir nehmen uns den Startwert für die Nierenfunktion, die Konzentration 
+  #nach 24h und Initialdosis
+  select(eGFRStart, C24, LD) %>%
+  
+  #Entfernen von NAs in Numerischen Faktoren
+  drop_na(eGFRStart, C24) %>%
+  
+  #Wir Filtern alle Patienten ohne Initialdosis
+  filter(LD > 0) %>%
+  
+  #Wir Kategorisieren wie für Plot 1 unsere Dosierung der Patienten
+  mutate(
+    dose.class = case_when(
+      C24 < 15 ~ "Unterdosiert",
+      C24 <= 20 ~ "Normaldosiert",
+      C24 > 20  ~ "Überdosiert"
+    )
+    ,
+    #Wir geben den Klassen eine Ordnung sodass sie im Plot Intuitiv dargestellt werden 
+    dose.class = factor(dose.class, 
+                        levels = c("Unterdosiert",
+                                   "Normaldosiert",
+                                   "Überdosiert"))
+  )
+
+ggplot(plot.3.data, aes(x = eGFRStart, y = C24)) +
+  geom_point(aes(color = dose.class), alpha = 0.6, size = 2) +
+  
+  geom_smooth(method = "lm", color = "#0B0405") +
+  
+  scale_color_viridis_d(option = "mako", begin = 0.2, end = 0.8) +
+  
+  labs(
+    title = "Nierenfunktion und Abbau von Vancomyicin",
+    subtitle = "Zusammenhang zwischen initialer Nierenfunktion und der
+    Konzentration von Vancomyicin im Blut nach 24 Stunden",
+    x = "Nierenfunktion (eGFR)",
+    y = "Vanconycin-Konzentration nach 24h (mg/L)",
+    color = "Klasse"
+  ) +
+  theme(
+    legend.position = "top"
+  )
+  
+
+#Wir speichern den Plot ab 
+ggsave(
+  filename = "Scatterplot_Lukas.svg",
+  width = 30,
+  height = 13,
+  units = "cm",
+  device = "svg"
+)

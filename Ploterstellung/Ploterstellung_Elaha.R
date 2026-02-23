@@ -4,6 +4,7 @@
 
 #Pakete Laden 
 library(tidyverse)
+library(svglite)
 
 #Datensatz laden
 load("vancomycin.RData")
@@ -50,7 +51,7 @@ ggplot(comorbidity_long, aes(x = reorder(Komorbiditaet, Anteil),
                              y = Anteil, fill = Komorbiditaet)) +
   
   #Barplot
-  geom_col() +
+  geom_col(alpha = 0.9) +
   
   #Text für den Median zum Drüberlegen 
   geom_text(aes(label = sprintf("%.1f", Anteil)), hjust = -0.15, size = 4) +
@@ -82,11 +83,11 @@ ggplot(comorbidity_long, aes(x = reorder(Komorbiditaet, Anteil),
 
 #Speichern des Plots
 ggsave(
-  filename = "Barplot_Elaha.png",
+  filename = "Barplot_Elaha.svg",
   width = 30,
   height = 13,
   units = "cm",
-  device = "png"
+  device = "svg"
 )
 
 #2. Schweregrad der Erkrankung 
@@ -131,7 +132,7 @@ meds <- severity_long %>%
 ggplot(severity_long, aes(x = "", y = Wert, fill = Parameter)) +
   
   #Boxplot 
-  geom_boxplot(alpha = 0.85, width = 0.6, outlier.alpha = 0.6) +
+  geom_boxplot(alpha = 0.85, width = 0.6, outlier.alpha = 0.6, alpha = 0.6) +
   
   #Erstellen mehrerer Grafiken
   facet_wrap(~ Parameter_label, scales = "free_y") +
@@ -140,7 +141,7 @@ ggplot(severity_long, aes(x = "", y = Wert, fill = Parameter)) +
   geom_text(
     data = meds,
     aes(x = 1, y = median, label = paste0("Median: ", round(median, 1))),
-    inherit.aes = FALSE,
+    inherit.aes = FALSE, 
     vjust = -0.8, size = 4
   ) +
   
@@ -166,9 +167,9 @@ ggplot(severity_long, aes(x = "", y = Wert, fill = Parameter)) +
 
 #Speichern des Plots
 ggsave(
-  filename = "Boxplot_Elaha.png",
+  filename = "Boxplot_Elaha.svg",
   width = 30,
   height = 13,
   units = "cm",
-  device = "png"
+  device = "svg"
 )

@@ -4,6 +4,7 @@ library(tidyverse)
 library(viridis)
 library(lubridate)
 library(ggbeeswarm)
+library(svglite)
 
 #Falls die Datei nicht gefunden wird, Working Directory auf Source File
 #Location setzten und die Namen nochmal Überprüfen 
@@ -78,11 +79,11 @@ ggplot(co_occur_df, aes(x = Indikation,
 
 #Abspeichern der Heatmap 
 ggsave(
-  filename = "Tileplot_John.png",
+  filename = "Tileplot_John.svg",
   width = 30,
   height = 13,
   units = "cm",
-  device = "png"
+  device = "svg"
 )
 
 
@@ -122,9 +123,9 @@ ggplot(df_violin, aes(x = Indikation, y = Age, color = Gender)) +
 
 #Abspeichern der Grafik 
 ggsave(
-  filename = "Beeswarmplot_John.png",
+  filename = "Beeswarmplot_John.svg",
   width = 30,
   height = 13,
   units = "cm",
-  device = "png"
+  device = "svg"
 )
