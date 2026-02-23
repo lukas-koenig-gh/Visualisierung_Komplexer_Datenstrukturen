@@ -6,15 +6,12 @@ library(viridis)
 library(lubridate)
 library(ggbeeswarm)
 
-# Falls die Datei nicht im Ordner gefunden wird, nutzt du: load(file.choose())
+#Falls die Datei nicht gefunden wird, Working Directory auf Source File
+#Location setzten und die Namen nochmal Überprüfen 
 load("vancomycin.RData")
 vancomycin <- dat
 
-# EINHEITLICHE FARBEN DEFINIEREN
-# Blau-Ton aus dem Beeswarm für die Heatmap-Spitze
-main_blue <- "#0072B2" 
-my_colors <- c("female" = "#E69F00", "male" = main_blue)
-
+#Auswahl der Spalten für die Heatmap 
 ind_cols <- c("Sepsis", "Schock", "Bacteraemia", "Catheter", "BJI", 
               "Endocarditis", "CNS", "Gastrointestinal", "Genitourinary", 
               "Pulmonary", "SSTI")
@@ -22,11 +19,17 @@ ind_cols <- c("Sepsis", "Schock", "Bacteraemia", "Catheter", "BJI",
 mik_cols <- c("Culture", "Polymicrobial", "MSSA", "MRSA", "CoNS", 
               "Streptococcus", "Enterococcus", "Enterobacterales", "PA", "Fungi")
 
+
 #################################################
 # 2. GECLUSTERTE HEATMAP (Blau-Schema)
 #################################################
+
 df_mik_ind <- vancomycin %>%
+  
+  #Auswahl aller Spalten die oben in den Vektoren sind 
   select(all_of(ind_cols), all_of(mik_cols)) %>%
+  
+  #Alle Werte auf Numerisch umstellen
   mutate(across(everything(), ~ as.numeric(. == "yes"))) 
 
 co_occur <- t(as.matrix(df_mik_ind[, ind_cols])) %*% as.matrix(df_mik_ind[, mik_cols])
@@ -40,16 +43,22 @@ co_occur_df <- as.data.frame(as.table(co_occur)) %>%
   mutate(Indikation = factor(Indikation, levels = rownames(co_occur)[hc_ind$order]),
          Befund = factor(Befund, levels = colnames(co_occur)[hc_bef$order]))
 
-#plot_heatmap <- 
-  ggplot(co_occur_df, aes(x = Indikation,
-                                        y = Befund,
-                                        fill = Haeufigkeit)) +
+
+#Ploterstellung
+ggplot(co_occur_df, aes(x = Indikation,
+                        y = Befund,
+                        fill = Haeufigkeit)) +
+  #Heatmap erstellen
   geom_tile(color = "white",
             linewidth = 0.5) +
+  
+  #Case-Zahlen auf die Heatmap schreiben 
   geom_text(aes(label = Haeufigkeit,
                 color = Haeufigkeit > max(Haeufigkeit)/2), 
             size = 3.5,
             show.legend = FALSE) +
+  
+  #Farbauswahl 
   scale_color_manual(values = c("FALSE" = "black",
                                 "TRUE" = "white")) +
   scale_fill_viridis_c(option = "mako",
@@ -57,8 +66,7 @@ co_occur_df <- as.data.frame(as.table(co_occur)) %>%
                        end = 0.8,
                        direction = -1) +
   
-  # Ein schöner Blau-Verlauf passend zum Beeswarm-Blau
-
+  #Theme Auswahl
   theme_minimal(base_size = 12) +
   
   #Achsenbeschriftung und Theme Anpassungen 
@@ -66,17 +74,21 @@ co_occur_df <- as.data.frame(as.table(co_occur)) %>%
        x = "Indikation",
        y = "Befund") +
   
+  #Entfernung des Gitters und anpassung des Textes 
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         panel.grid = element_blank())
 
-  ggsave(
-    filename = "Tileplot_John.png",
-    width = 30,
-    height = 13,
-    units = "cm",
-    device = "png"
-  )
-  
+
+#Abspeichern der Heatmap 
+ggsave(
+  filename = "Tileplot_John.png",
+  width = 30,
+  height = 13,
+  units = "cm",
+  device = "png"
+)
+
+
 #################################################
 # 3. BEESWARM PLOT (DEUTSCH & OPTIMIERT)
 #################################################
