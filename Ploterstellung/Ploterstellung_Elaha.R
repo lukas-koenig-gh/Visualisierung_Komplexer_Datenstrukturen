@@ -51,7 +51,7 @@ ggplot(comorbidity_long, aes(x = reorder(Komorbiditaet, Anteil),
                              y = Anteil, fill = Komorbiditaet)) +
   
   #Barplot
-  geom_col(alpha = 0.9) +
+  geom_col(alpha = 0.7) +
   
   #Text für den Median zum Drüberlegen 
   geom_text(aes(label = sprintf("%.1f", Anteil)), hjust = -0.15, size = 4) +
@@ -132,7 +132,7 @@ meds <- severity_long %>%
 ggplot(severity_long, aes(x = "", y = Wert, fill = Parameter)) +
   
   #Boxplot 
-  geom_boxplot(alpha = 0.85, width = 0.6, outlier.alpha = 0.6, alpha = 0.6) +
+  geom_boxplot(alpha = 0.6, width = 0.6, outlier.alpha = 0.6, alpha = 0.6) +
   
   #Erstellen mehrerer Grafiken
   facet_wrap(~ Parameter_label, scales = "free_y") +

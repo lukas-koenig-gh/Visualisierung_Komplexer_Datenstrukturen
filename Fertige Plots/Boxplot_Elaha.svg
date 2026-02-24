@@ -47,7 +47,7 @@
 <circle cx='236.04' cy='57.45' r='2.39' style='stroke-width: 0.71; stroke: #333333; stroke-opacity: 0.60; fill: #333333; fill-opacity: 0.60;' />
 <line x1='236.04' y1='109.93' x2='236.04' y2='64.88' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt;' />
 <line x1='236.04' y1='141.04' x2='236.04' y2='185.63' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt;' />
-<polygon points='139.09,109.93 139.09,141.04 332.99,141.04 332.99,109.93 139.09,109.93 ' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter; fill: #35A1AB; fill-opacity: 0.85;' />
+<polygon points='139.09,109.93 139.09,141.04 332.99,141.04 332.99,109.93 139.09,109.93 ' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter; fill: #35A1AB; fill-opacity: 0.60;' />
 <line x1='139.09' y1='126.18' x2='332.99' y2='126.18' style='stroke-width: 2.72; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter;' />
 <text x='236.04' y='119.67' text-anchor='middle' style='font-size: 11.38px; font-family: "Arial";' textLength='56.28px' lengthAdjust='spacingAndGlyphs'>Median: 36</text>
 </g>
@@ -111,7 +111,7 @@
 <circle cx='236.04' cy='289.57' r='2.39' style='stroke-width: 0.71; stroke: #333333; stroke-opacity: 0.60; fill: #333333; fill-opacity: 0.60;' />
 <line x1='236.04' y1='327.89' x2='236.04' y2='305.88' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt;' />
 <line x1='236.04' y1='342.66' x2='236.04' y2='355.12' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt;' />
-<polygon points='139.09,327.89 139.09,342.66 332.99,342.66 332.99,327.89 139.09,327.89 ' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter; fill: #3671A0; fill-opacity: 0.85;' />
+<polygon points='139.09,327.89 139.09,342.66 332.99,342.66 332.99,327.89 139.09,327.89 ' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter; fill: #3671A0; fill-opacity: 0.60;' />
 <line x1='139.09' y1='336.50' x2='332.99' y2='336.50' style='stroke-width: 2.72; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter;' />
 <text x='236.04' y='329.99' text-anchor='middle' style='font-size: 11.38px; font-family: "Arial";' textLength='65.77px' lengthAdjust='spacingAndGlyphs'>Median: 13.4</text>
 </g>
@@ -134,7 +134,7 @@
 <polyline points='649.52,192.04 649.52,51.04 ' style='stroke-width: 1.36; stroke: #EBEBEB; stroke-linecap: butt;' />
 <line x1='649.52' y1='107.30' x2='649.52' y2='57.45' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt;' />
 <line x1='649.52' y1='157.14' x2='649.52' y2='185.63' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt;' />
-<polygon points='552.57,107.30 552.57,157.14 746.47,157.14 746.47,107.30 552.57,107.30 ' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter; fill: #60CEAC; fill-opacity: 0.85;' />
+<polygon points='552.57,107.30 552.57,157.14 746.47,157.14 746.47,107.30 552.57,107.30 ' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter; fill: #60CEAC; fill-opacity: 0.60;' />
 <line x1='552.57' y1='128.66' x2='746.47' y2='128.66' style='stroke-width: 2.72; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter;' />
 <text x='649.52' y='122.14' text-anchor='middle' style='font-size: 11.38px; font-family: "Arial";' textLength='49.95px' lengthAdjust='spacingAndGlyphs'>Median: 8</text>
 </g>
@@ -166,7 +166,7 @@
 <circle cx='649.52' cy='226.94' r='2.39' style='stroke-width: 0.71; stroke: #333333; stroke-opacity: 0.60; fill: #333333; fill-opacity: 0.60;' />
 <line x1='649.52' y1='298.24' x2='649.52' y2='241.98' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt;' />
 <line x1='649.52' y1='335.83' x2='649.52' y2='355.12' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt;' />
-<polygon points='552.57,298.24 552.57,335.83 746.47,335.83 746.47,298.24 552.57,298.24 ' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter; fill: #414081; fill-opacity: 0.85;' />
+<polygon points='552.57,298.24 552.57,335.83 746.47,335.83 746.47,298.24 552.57,298.24 ' style='stroke-width: 1.36; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter; fill: #414081; fill-opacity: 0.60;' />
 <line x1='552.57' y1='318.39' x2='746.47' y2='318.39' style='stroke-width: 2.72; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter;' />
 <text x='649.52' y='311.88' text-anchor='middle' style='font-size: 11.38px; font-family: "Arial";' textLength='56.28px' lengthAdjust='spacingAndGlyphs'>Median: 15</text>
 </g>

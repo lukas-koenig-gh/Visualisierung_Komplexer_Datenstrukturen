@@ -4,9 +4,13 @@
 
 # Pakete laden
 library(tidyverse)
+library(svglite)
 
 # Datei laden
-vancomycin <- read.csv("vancomycin.csv")
+
+load("vancomycin.RData")
+
+vancomycin <- dat
 
 ################################################################################
 # Grafik 1
@@ -52,7 +56,7 @@ ggplot(df_final, aes(x = Gruppe, y = Delta_SCr, fill = Gruppe == "Keine Nephroto
   geom_hline(yintercept = 0, linetype = "dashed") +
   
   # Manuelle, diskrete Farben für kategoriale Daten (Blau vs. Orange)
-  scale_fill_manual(values = c("TRUE" = "#0072B2", "FALSE" = "#D55E00")) +
+  scale_fill_viridis_d(option = "mako", begin = 0.3, end = 0.8) +
   
   labs(
     title = "Einfluss von Nephrotoxinen auf die Nierenfunktion",
@@ -66,6 +70,14 @@ ggplot(df_final, aes(x = Gruppe, y = Delta_SCr, fill = Gruppe == "Keine Nephroto
     legend.position = "none",
     axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
   )
+
+ggsave(
+  filename = "Boxplot_Jitter_Annika_8.svg",
+  width = 30,
+  height = 13,
+  units = "cm",
+  device = "svg"
+)
 
 ################################################################################
 # Grafik 2
@@ -97,11 +109,7 @@ ggplot(mortality, aes(x = eGFREnd, fill = Verstorben)) +
   
   geom_histogram(position = "identity", alpha = 0.5, color = "white", bins = 20) +
   
-  # Manuelle, farbblindenfreundliche HCL-Farben (aus der Vorlesung)
-  scale_fill_manual(values = setNames(
-    c("#0072B2", "#D55E00"), 
-    c(label_ueberlebt, label_verstorben)
-  )) +
+  scale_fill_viridis_d(option = "mako", begin = 0.5, end = 0.8) +
   
   # Beschriftungen
   labs(
@@ -113,3 +121,12 @@ ggplot(mortality, aes(x = eGFREnd, fill = Verstorben)) +
   ) +
   theme_minimal() +
   theme(legend.position = "top") 
+
+ggsave(
+  filename = "Stacked_Histogramm_Annika_9.svg",
+  width = 30,
+  height = 13,
+  units = "cm",
+  device = "svg"
+)
+
