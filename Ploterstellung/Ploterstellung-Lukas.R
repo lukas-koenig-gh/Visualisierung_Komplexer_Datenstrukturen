@@ -9,6 +9,12 @@ library(tidyverse)
 library(grid)
 library(svglite)
 
+#Divergierende Farbpalette 
+color <- c("#5B50A1", "#536872", "#40B7AD")
+
+
+
+
 #Plot 1 - Scatterplot mit Polynomieller Regressionsanalyse 
 
 plot.1.data <- data %>%
@@ -36,22 +42,22 @@ plot.1.data <- data %>%
                         levels = c("Unterdosierte Patienten", "Normaldosierte Patienten", "Überdosierte Patienten"))
   )
 
+dose.class.null <- plot.1.data %>%
+  select(-dose.class) 
+
 #Wir erstellen unseren ggplot mit den erstellten daten
-ggplot(plot.1.data, aes(x = Weight, y = LD, color = dose.class, fill = dose.class)) +
+ggplot(plot.1.data, aes(x = Weight, y = LD)) +
+  
+  geom_jitter(data = dose.class.null, color = "grey90" ) +
   
   #Wir zeichnen die Patienten als Punkte ein 
-  geom_point(alpha = 0.9) +
-  
-  #Wir ziehen eine Polynomielle Regressionskurve durch
-  #Die Kurve wird etwas abgeweicht damit man klar den Trend erkennen kann
-  geom_smooth(span = 1.2) +
+  geom_point(alpha = 0.9, aes(color = dose.class, fill = dose.class)) +
   
   #Wir spalten unsere Daten nach der vorher gennanten Dosierungsklasse auf 
   facet_wrap(~ dose.class) +
   
   #Wir bestimmen unsere Farbgebung 
-  scale_color_viridis_d(option = "mako", begin = 0.3, end = 0.8) +
-  scale_fill_viridis_d(option = "mako", begin = 0.3, end = 0.8) +
+  scale_color_manual(values = color) +
   
   #Wir fügen Achsenbeschriftungen hinzu
   labs(
@@ -62,6 +68,7 @@ ggplot(plot.1.data, aes(x = Weight, y = LD, color = dose.class, fill = dose.clas
     
     #Wir entfernen die Legende 
   ) +
+  theme_minimal(base_size = 12) +
   theme(
     legend.position = "none"
   ) 
