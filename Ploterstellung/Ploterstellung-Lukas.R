@@ -83,6 +83,38 @@ ggsave(
   device = "svg"
 )
 
+plot.absolute.dosis <- plot.1.data %>%
+  # DEINE IDEE: Wir berechnen die absolute Dosis
+  mutate(
+    Absolute_LD = LD * Weight
+  )
+
+ggplot(plot.absolute.dosis, aes(x = Weight, y = Absolute_LD, color = dose.class)) +
+  
+  # Wir nutzen Jitter statt Point, um Overplotting bei Standard-Dosen aufzulösen
+  # height = 50 sorgt dafür, dass die Punkte auf der Y-Achse leicht (um 50mg) streuen
+  geom_jitter(alpha = 0.7, size = 2.5, width = 0, height = 50) +
+  
+  # Wir zeichnen typische Ampullen-Größen als Referenzlinien ein
+  geom_hline(yintercept = c(1000, 1500, 2000), linetype = "dashed", color = "gray50", alpha = 0.5) +
+  
+  scale_color_manual(values = c("Unterdosiert" = "#5B50A1", 
+                                "Normaldosiert" = "#87969E", 
+                                "Überdosiert" = "#40B7AD")) +
+  
+  labs(
+    title = "Die Illusion der Präzision: Standarddosen statt Gewichts-Adaption",
+    subtitle = "Die Linien bei z.B. 1000mg oder 1500mg zeigen: Ärzte dosieren oft in festen Blöcken.\nDie farbliche Durchmischung beweist, dass dies zu unvorhersehbaren Ergebnissen führt.",
+    x = "Gewicht (in kg)",
+    y = "Tatsächliche absolute Initialdosis (in mg)",
+    color = "Resultat (C24)"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "top",
+    panel.grid.minor = element_blank()
+  )
+
 #Erstellung von Plot 2, Boxplot des Verlaufs vom Antibiotikumsspiegel
 
 #Wir erstellen einen neuen Datensatz
