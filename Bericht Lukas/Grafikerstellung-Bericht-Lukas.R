@@ -6,6 +6,7 @@ load("vancomycin.Rdata")
 #Librarys 
 library(tidyverse)
 library(rsample)
+library(yardstick)
 
 #Plot 1 - Marginal Plot 
 
@@ -150,4 +151,35 @@ model.data <- dat %>%
 #Wir holen uns aus dem Split Objekt unsere Datensätze heraus 
 training.data <- training(model.data)
 testing.data <- testing(model.data)
+
+#Wir erstellen unsere Modelle
+
+#1. Modell basierend nur auf Gewicht und Loading Dose 
+Model.1 <- lm(C24 ~ Weight + LD, data = training.data)
+
+#2. Modell basierend auf Nierenfunktion Gewicht und Loading Dose
+Model.2 <- lm(C24 ~ Weight + eGFRStart + LD, data = training.data)
+
+#Wir bauen unsere Vorhergesagten Daten und unsere Echten Daten zusammen
+plot.3.data <- testing.data %>%
+  mutate(
+    weight.ld.model = predict(Model.1, newdata = testing.data),
+    weight.egfr.ld.model = predict(Model.2, newdata = testing.data)
+  ) %>%
+  pivot_longer(cols = c(weight.ld.model, weight.egfr.ld.model),
+               names_to = "Model",
+               values_to = "Predictions")
+
+#Erstellung eines Plots zum sehen der Vorhersagen 
+ggplot(plot.3.data, aes(x = C24, y = Predictions, color = Model )) +
+  geom_point(alpha = 0.7) +
+  geom_abline(alpha = 0.3, color = "darkred", intercept = 0, slope = 1) +
+  coord_fixed(xlim = c(0, 60), ylim = c(0, 60)) +
+  facet_wrap(~ Model) 
+
+#Wir testen wie gut unsere Modelle sind 
+model.testing.data <- plot.3.data %>%
+  group_by(Model) %>%
+  rmse(truth = C24, estimate = Predictions)
+  
 
