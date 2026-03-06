@@ -8,6 +8,7 @@ library(tidyverse)
 library(rsample)
 library(yardstick)
 library(ranger)
+library(mrgsolve)
 
 #Um Codewiederholungen zu vermeiden 
 dat <- dat %>%
@@ -170,37 +171,28 @@ final.model <- ranger(
   importance = "impurity"
 )
 
-#Wir erstellen zustätzlich unsere Funktion die das Leitlinienmodell simuliert 
-formula.model <- function(weight){
-  dosis <- weight * 15;
-  return(dosis)
-}
+#Wir erstellen Code mittles mrgsolve welcher die Vancomycin Konzentration präzise 
+#vorhersagt
 
-#Wir bauen unsere Vorhergesagten Daten und unsere Echten Daten zusammen
-plot.4.data <- testing.data %>%
-  
-  #Wir erschaffen unsere Spalten mit den Modellvorhersagen 
-  mutate(
-    
-  ) %>%
-  
-  #Langziehen und gruppieren der Daten für facet_wrap
-  pivot_longer(cols = c(final.model),
-               names_to = "Model",
-               values_to = "Predictions")
+goti_code <- "
+$PROB
+Goti 2018 - Vancomycin 2-Kompartment-Modell
 
-#Erstellung eines Plots zum sehen der Vorhersagen 
-ggplot(plot.4.data, aes(x = C24, y = Predictions, color = Model )) +
-  
-  #Wir legen unseren Scatterplots mit den tatsächlichen und den Vorhergesagten werten 
-  geom_point(alpha = 0.7) +
-  
-  #Wir ziehen eine Linie durch die Modelle 
-  geom_abline(alpha = 0.3, color = "darkred", intercept = 0, slope = 1) +
-  
-  #Wir verwenden Coord_fixed damit die diagonale korrekt dargestellt wird 
-  coord_fixed(xlim = c(0, 60), ylim = c(0, 60)) +
-  
-  #Wir gruppieren die Punkte nach Modell 
-  facet_wrap(~ Model) 
+$CMT
+blood tissue 
 
+$PARAM
+//Typische Populationswerte welche wir brauchen werdne 
+TVCL = 3.5 //Typische Clearance (L/h)
+TVV1 = 40.0 // TYpisches Volumen Blut (L)
+TVQ = 2.0 //Typische interkompartimentelle Clearance (L/h)
+TVV2 = 50.0 // Typisches Volumen Gewebe (L)
+
+//Patienten-Kovariaten
+WT = 70 //Gewicht in Kg
+CRCL = 100 //Kreatininclearance in ml/min
+
+$MAIN 
+
+
+"
