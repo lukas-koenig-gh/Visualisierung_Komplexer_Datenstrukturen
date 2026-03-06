@@ -7,6 +7,21 @@ load("vancomycin.Rdata")
 library(tidyverse)
 library(rsample)
 library(yardstick)
+library(ranger)
+
+#Um Codewiederholungen zu vermeiden 
+dat <- dat %>%
+  mutate(
+    dose.class = case_when(
+      C24 > 20 ~ "Überdosiert",
+      C24 >= 15 ~ "Normaldosiert",
+      C24 < 15 ~ "Unterdosiert"
+    ),
+    dose.class = factor(dose.class,
+                        levels = c("Unterdosiert",
+                                   "Normaldosiert",
+                                   "Überdosiert"))
+    )
 
 #Plot 1 - Marginal Plot 
 
@@ -15,35 +30,22 @@ library(yardstick)
 plot.1.data <- dat %>%
   
   #Wir wählen unsere Notwendigen Spalten aus 
-  select(Weight, C24, LD) %>%
+  select(dose.class, Weight, C24, LD) %>%
   
   #Wir Entfernen unnötige Werte 
   drop_na() %>%
   
   #Wir Filtern Patienten ohne eine Initialdosis Vancomyicin 
-  filter(LD > 0) %>%
+  filter(LD > 0)
   
-  #Wir Kategorisieren die Patienten anhand des C24 Werts auf unter/überdosierung
-  mutate(
-    dose.class = case_when(
-      C24 > 20 ~ "Überdosiert",
-      C24 >= 15 ~ "Normaldosiert",
-      C24 < 15 ~ "Unterdosiert"
-    ),
-    
-    #Wir refactorn unsere Dosierungsklassen damit sie nicht Alphabetisch Sortiert sind
-    dose.class = factor(dose.class, levels = c("Unterdosiert", "Normaldosiert", "Überdosiert")),
-    Absolute_LD = LD * Weight
-  )
 
 #Wir hinterlegen später Jitter da wir ja mit Facet-wrap die Dossierungklassen trennen
 #Allerding wollen wir trotzdem zeigen wie ähnlich sich die Gruppen sind #
-
-
 dose.class.null <- plot.1.data %>%
   select(-dose.class) 
-#Datenvisualisierung Plot 2 
 
+
+#Datenvisualisierung Plot 1
 
 #Wir erstellen unseren ggplot mit den erstellten daten
 ggplot(plot.1.data, aes(x = Weight, y = LD)) +
@@ -55,9 +57,6 @@ ggplot(plot.1.data, aes(x = Weight, y = LD)) +
   
   #Wir spalten unsere Daten nach der vorher gennanten Dosierungsklasse auf 
   facet_wrap(~ dose.class) +
-  
-  #Wir bestimmen unsere Farbgebung 
-  scale_color_manual(values = color) +
   
   #Wir fügen Achsenbeschriftungen hinzu
   labs(
@@ -74,18 +73,17 @@ ggplot(plot.1.data, aes(x = Weight, y = LD)) +
   ) 
 
 
-
-#Plot 2 - Zusammenhang zwischen Nierenfunktion und der Abbaurate von Vancomyicin 
+#Plot 2 - Zusammenhang zwischen Nierenfunktion/Gewicht/SAPS und anderen Faktoren und der Abbaurate von Vancomyicin 
 
 #Datenaufbereitung 
-plot.2.data <- data %>%
+plot.2.data <- dat %>%
   
   #Wir nehmen uns den Startwert für die Nierenfunktion, die Konzentration 
   #nach 24h und Initialdosis
-  select(eGFRStart, C24, LD) %>%
+  select(eGFRStart, C24, LD, SAPS, Weight) %>%
   
   #Entfernen von NAs in Numerischen Faktoren
-  drop_na(eGFRStart, C24) %>%
+  drop_na() %>%
   
   #Wir Filtern alle Patienten ohne Initialdosis
   filter(LD > 0) %>%
@@ -103,43 +101,54 @@ plot.2.data <- data %>%
                         levels = c("Unterdosiert",
                                    "Normaldosiert",
                                    "Überdosiert"))
+  ) %>% 
+  
+  pivot_longer(
+    cols = c(eGFRStart, LD, SAPS, Weight),
+    names_to = "param",
+    values_to = "vals"
   )
 
-ggplot(plot.2.data, aes(x = eGFRStart, y = C24)) +
+ggplot(plot.2.data, aes(x = vals, y = C24)) +
   geom_point(aes(color = dose.class), alpha = 0.6, size = 2) +
   
   geom_smooth(method = "lm", color = "#0B0405", se = FALSE) +
   
-  #scale_color_viridis_d(option = "mako", begin = 0.2, end = 0.8) +
-  scale_color_manual(values = color) +
-  
-  # geom_hline(yintercept = 15, linetype = "dashed", color = "#87969E", linewidth = 1) +
-  # geom_hline(yintercept = 20, linetype = "dashed", color = "#87969E", linewidth = 1) +
-  
-  labs(
-    title = "Nierenfunktion und Abbau von Vancomyicin",
-    subtitle = "Zusammenhang zwischen initialer Nierenfunktion und der
-    Konzentration von Vancomyicin im Blut nach 24 Stunden",
-    x = "Nierenfunktion (eGFR)",
-    y = "Vanconycin-Konzentration nach 24h (mg/L)",
-    color = "Klasse"
-  ) +
+  facet_wrap(~ param) +
+
   theme_minimal(base_size = 12) +
   theme(
     legend.position = "top"
   )
 
-#Plot 3/4 wLineare Modelle entwickeln und Testen
+#Plot3 - Kategorische Risikofaktoren und Dosierungsreinlfluss 
 
-#Wir werden 2 Modelle Testen eins was die auf Nierenfunktion und Gewicht basiert 
-#sowie eins was nur auf Gewicht basiert 
+#Datenaufbereitung 
+
+plot.3.data <- dat %>%
+  select(dose.class, C24, LD, Hypertension, CKD, Sepsis, Vasopressors) %>%
+  drop_na() %>%
+  filter(LD > 0) %>%
+  pivot_longer(
+    cols = c(Hypertension, CKD, Sepsis, Vasopressors),
+    names_to = "Risikofaktoren",
+    values_to = "Status"
+  )
+
+ggplot(plot.3.data, aes(x = Status, fill = dose.class)) +
+  geom_bar(position = "fill", alpha = 0.85, width = 0.6) +
+  facet_wrap(~ Risikofaktoren) +
+  scale_y_continuous(labels = scales::percent_format())
+
+
+#Plot 4 KI-Modelle entwickeln und Testen
+
+#Reproduzierbarkeit gewährleisten 
+set.seed(123)
 
 #Datenaufbereitung 
 
 model.data <- dat %>%
-  
-  #Wir nehmen uns die Spalten auf denen die Modelle Trainiert und getestet werden sollen 
-  select(Weight, eGFRStart, LD, C24) %>%
   
   #Wir entfernen alle Fehlenden Werte
   drop_na() %>%
@@ -152,34 +161,46 @@ model.data <- dat %>%
 training.data <- training(model.data)
 testing.data <- testing(model.data)
 
-#Wir erstellen unsere Modelle
+#Basierend auf den Daten erschaffen wir ein Modell mit Realistischen Parametern 
+#die schnell Erhoben werden können
+final.model <- ranger(
+  formula = C24 ~ Weight + LD + SAPS + Hypertension + Vasopressors + CKD + Sepsis,
+  data = training.data,
+  num.trees = 1000,
+  importance = "impurity"
+)
 
-#1. Modell basierend nur auf Gewicht und Loading Dose 
-Model.1 <- lm(C24 ~ Weight + LD, data = training.data)
-
-#2. Modell basierend auf Nierenfunktion Gewicht und Loading Dose
-Model.2 <- lm(C24 ~ Weight + eGFRStart + LD, data = training.data)
+#Wir erstellen zustätzlich unsere Funktion die das Leitlinienmodell simuliert 
+formula.model <- function(weight){
+  dosis <- weight * 15;
+  return(dosis)
+}
 
 #Wir bauen unsere Vorhergesagten Daten und unsere Echten Daten zusammen
-plot.3.data <- testing.data %>%
+plot.4.data <- testing.data %>%
+  
+  #Wir erschaffen unsere Spalten mit den Modellvorhersagen 
   mutate(
-    weight.ld.model = predict(Model.1, newdata = testing.data),
-    weight.egfr.ld.model = predict(Model.2, newdata = testing.data)
+    
   ) %>%
-  pivot_longer(cols = c(weight.ld.model, weight.egfr.ld.model),
+  
+  #Langziehen und gruppieren der Daten für facet_wrap
+  pivot_longer(cols = c(final.model),
                names_to = "Model",
                values_to = "Predictions")
 
 #Erstellung eines Plots zum sehen der Vorhersagen 
-ggplot(plot.3.data, aes(x = C24, y = Predictions, color = Model )) +
-  geom_point(alpha = 0.7) +
-  geom_abline(alpha = 0.3, color = "darkred", intercept = 0, slope = 1) +
-  coord_fixed(xlim = c(0, 60), ylim = c(0, 60)) +
-  facet_wrap(~ Model) 
-
-#Wir testen wie gut unsere Modelle sind 
-model.testing.data <- plot.3.data %>%
-  group_by(Model) %>%
-  rmse(truth = C24, estimate = Predictions)
+ggplot(plot.4.data, aes(x = C24, y = Predictions, color = Model )) +
   
+  #Wir legen unseren Scatterplots mit den tatsächlichen und den Vorhergesagten werten 
+  geom_point(alpha = 0.7) +
+  
+  #Wir ziehen eine Linie durch die Modelle 
+  geom_abline(alpha = 0.3, color = "darkred", intercept = 0, slope = 1) +
+  
+  #Wir verwenden Coord_fixed damit die diagonale korrekt dargestellt wird 
+  coord_fixed(xlim = c(0, 60), ylim = c(0, 60)) +
+  
+  #Wir gruppieren die Punkte nach Modell 
+  facet_wrap(~ Model) 
 
