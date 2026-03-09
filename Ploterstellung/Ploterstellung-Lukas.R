@@ -14,8 +14,6 @@ library(lubridate)
 color <- c("#5B50A1", "#536872", "#40B7AD")
 
 
-
-
 #Plot 1 - Scatterplot mit Polynomieller Regressionsanalyse 
 
 plot.1.data <- data %>%
