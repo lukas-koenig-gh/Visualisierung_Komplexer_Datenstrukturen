@@ -9,7 +9,7 @@ library(rpart)
 library(rpart.plot)
 
 #Farbpalette
-color <- c("#0072B2", "grey30", "#D55E00")
+color <- c("#0072B2", "grey40", "#D55E00")
 
 #Um Codewiederholungen zu vermeiden 
 dat <- dat %>%
@@ -30,7 +30,16 @@ dat <- dat %>%
 
 #Signifikanztests 
 
+#Wir filtern die untersuchenden Faktoren raus um zu schauen wie signifikant diese sind
+sig.test <- dat %>%
+  filter(LD > 0) %>%
+  drop_na(LD, Weight, C24, eGFRStart, SAPS, CKD, Vasopressors, Hypertension, Sepsis)
 
+#Wir bauen ein Modell
+model.sig <- lm(C24 ~ Weight + eGFRStart + Weight + LD + CKD + Vasopressors + Hypertension + Sepsis, data = sig.test)
+
+#Wir geben das Modell aus 
+summary(model.sig)
 
 #Plot 1 - Marginal Plot 
 
@@ -65,7 +74,7 @@ ggplot(plot.1.data, aes(x = Weight, y = LD)) +
   geom_point(alpha = 0.9, aes(color = dose.class, fill = dose.class)) +
   
   #Wir zeichnen die Leitlinie ein damit man sehen kann wie weit die Ärzte abweichen
-  geom_hline(yintercept = 15, linetype = "dashed", color = "firebrick", linewidth = 0.8) +
+  geom_hline(yintercept = 15, linetype = "dashed", color = "black", linewidth = 0.8) +
   
   #Wir spalten unsere Daten nach der vorher gennanten Dosierungsklasse auf 
   facet_wrap(~ dose.class) +
@@ -75,7 +84,7 @@ ggplot(plot.1.data, aes(x = Weight, y = LD)) +
   
   #Wir fügen Achsenbeschriftungen hinzu
   labs(
-    subtitle = "Dierote Linie makiert die offizielle Leitline zur Dosierung - (15 mg/kg)",
+    subtitle = "Die schwarze Linie makiert die offizielle Leitline zur Dosierung - (15 mg/kg)",
     x = "Gewicht (in kg)",
     y = "Initialdosis (in mg/Kg)"
     
